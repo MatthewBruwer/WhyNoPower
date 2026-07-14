@@ -1,0 +1,48 @@
+﻿# ===== Secrets =====
+.env
+.env.local
+*.env
+!.env.example
+
+# ===== .NET =====
+bin/
+obj/
+*.user
+*.suo
+.vs/
+[Dd]ebug/
+[Rr]elease/
+*.dll
+*.pdb
+
+# ===== Node / React =====
+node_modules/
+dist/
+build/
+.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+*.sqlite3
+
+# ===== IDE / OS =====
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ===== Azure / deployment =====
+*.PublishSettings
+local.settings.json
+
+# ===== Logs =====
+*.log
+logs/
