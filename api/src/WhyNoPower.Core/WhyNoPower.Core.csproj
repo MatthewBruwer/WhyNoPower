@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Pure domain: entities, enums, domain services. No ASP.NET / EF references. -->
+</Project>
