@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhyNoPower — Week Ahead (mockup)</title>
+<style>
+  /* ── Design tokens ─────────────────────────────────────────────
+     These become the Tailwind theme later. Edit here, not inline. */
+  :root {
+    --bg:            #0a0d0b;   /* page background, near-black w/ green cast */
+    --surface:       #11150f;   /* flat chart/panel surface */
+    --glass:         rgba(255,255,255,0.04); /* glassy card fill */
+    --glass-border:  rgba(255,255,255,0.08);
+    --green:         #34d24b;   /* brand + generation/positive */
+    --green-dim:     rgba(52,210,75,0.35);
+    --red:           #f0453a;   /* negative deviation */
+    --text:          #f2f4f1;
+    --text-2:        #9aa39b;   /* secondary text */
+    --text-3:        #5c655d;   /* labels/axis */
+    --radius:        14px;
+    --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    padding: 32px 40px 64px;
+  }
+  .shell { max-width: 1160px; margin: 0 auto; }
+
+  /* ── Header strip ── */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 36px;
+  }
+  .brand { font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+  .brand .accent { color: var(--green); }
+  .header-right { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-2); }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 14px; border-radius: 999px;
+    background: var(--glass); border: 1px solid var(--glass-border);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.ok { background: var(--green); box-shadow: 0 0 6px var(--green-dim); }
+  .dot.warn { background: var(--red); }
+
+  /* ── Hero stat ── */
+  .hero { margin-bottom: 40px; }
+  .hero .eyebrow { font-size: 13px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-3); margin-bottom: 10px; }
+  .hero .stat { font-size: 56px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .hero .stat .rand { color: var(--green); }
+  .hero .sub { margin-top: 12px; font-size: 15px; color: var(--text-2); }
+
+  /* ── Chart panel (flat surface, not glass) ── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: var(--radius);
+    padding: 28px 28px 20px;
+    margin-bottom: 24px;
+  }
+  .panel h2 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .panel .hint { font-size: 12.5px; color: var(--text-3); margin-bottom: 20px; }
+  .legend { display: flex; gap: 20px; font-size: 12px; color: var(--text-2); margin-bottom: 16px; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .swatch { width: 12px; height: 12px; border-radius: 3px; }
+  .swatch.measured { background: var(--green); }
+  .swatch.forecast { border: 1.5px dashed var(--green-dim); background: transparent; }
+
+  .chart { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; align-items: end; height: 230px; }
+  .day { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; position: relative; }
+  .bars { position: relative; flex: 1; display: flex; align-items: flex-end; justify-content: center; }
+  .bar {
+    width: 58%; border-radius: 6px 6px 0 0;
+  }
+  .bar.measured { background: linear-gradient(180deg, var(--green), #1f9e37); }
+  .bar.forecast-ghost {
+    position: absolute; bottom: 0; width: 58%;
+    border: 1.5px dashed var(--green-dim); border-bottom: none;
+    border-radius: 6px 6px 0 0;
+  }
+  .bar.forecast-only {
+    background: transparent;
+    border: 1.5px dashed var(--green-dim); border-bottom: none;
+  }
+  .dev { position: absolute; top: -22px; width: 100%; text-align: center; font-size: 11.5px; font-weight: 600; }
+  .dev.up { color: var(--green); }
+  .dev.down { color: var(--red); }
+
+  /* ── Weather row aligned under same columns ── */
+  .meta-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
+  .meta-row .cell { font-size: 12px; color: var(--text-2); }
+  .cell .wx { font-size: 20px; display: block; margin-bottom: 4px; }
+  .cell .dayname { display: block; color: var(--text-3); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .cell .kwh { display: block; margin-top: 4px; color: var(--text); font-variant-numeric: tabular-nums; }
+  .cell.today .dayname { color: var(--green); }
+
+  /* ── Secondary cards (glass) ── */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card {
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    backdrop-filter: blur(6px);
+  }
+  .card .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 10px; }
+  .card .value { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .card .value .unit { font-size: 15px; font-weight: 500; color: var(--text-2); }
+  .card .note { margin-top: 8px; font-size: 13px; color: var(--text-2); line-height: 1.45; }
+  .card .note .neg { color: var(--red); font-weight: 600; }
+  .pill {
+    display: inline-block; margin-top: 14px;
+    padding: 8px 18px; border-radius: 999px;
+    background: var(--green); color: #06210c;
+    font-size: 13px; font-weight: 600; text-decoration: none;
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header>
+    <div class="brand">WhyNo<span class="accent">Power</span></div>
+    <div class="header-right">
+      <span>Randburg · Johannesburg</span>
+      <span>☀️ 18°C, clear</span>
+      <span class="chip"><span class="dot ok"></span>Inverter synced 2h ago</span>
+      <!-- Degraded state variant:
+      <span class="chip"><span class="dot warn"></span>Inverter offline — showing forecast only</span> -->
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Your week ahead · 13–19 Jul</div>
+    <div class="stat">≈ 118 kWh · <span class="rand">R413</span> of sun</div>
+    <div class="sub">Forecast for your 4.8 kWp system at R3.50/kWh. Clear skies mid-week carry most of it.</div>
+  </section>
+
+  <section class="panel">
+    <h2>Generation — measured vs forecast</h2>
+    <div class="hint">Solid bars are what your inverter actually produced; dashed outlines are the forecast.</div>
+    <div class="legend">
+      <span><span class="swatch measured"></span>Measured</span>
+      <span><span class="swatch forecast"></span>Forecast</span>
+    </div>
+
+    <div class="chart">
+      <!-- Past: measured bar + forecast ghost + deviation label -->
+      <div class="day"><div class="bars">
+        <div class="bar forecast-ghost" style="height:78%"></div>
+        <div class="bar measured" style="height:83%"></div>
+        <div class="dev up">+R7</div>
+      </div></div>
+      <div class="day"><div class="bars">
+        <div class="bar forecast-ghost" style="height:85%"></div>
+        <div class="bar measured" style="height:66%"></div>
+        <div class="dev down">−R12</div>
+      </div></div>
+      <div class="day"><div class="bars">
+        <div class="bar forecast-ghost" style="height:60%"></div>
+        <div class="bar measured" style="height:63%"></div>
+        <div class="dev up">+R2</div>
+      </div></div>
+      <!-- Today onwards: forecast only -->
+      <div class="day"><div class="bars"><div class="bar forecast-only" style="height:88%"></div></div></div>
+      <div class="day"><div class="bars"><div class="bar forecast-only" style="height:92%"></div></div></div>
+      <div class="day"><div class="bars"><div class="bar forecast-only" style="height:54%"></div></div></div>
+      <div class="day"><div class="bars"><div class="bar forecast-only" style="height:70%"></div></div></div>
+    </div>
+
+    <div class="meta-row">
+      <div class="cell"><span class="dayname">Mon</span><span class="wx">☀️</span>18° · clear<span class="kwh">17.9 kWh</span></div>
+      <div class="cell"><span class="dayname">Tue</span><span class="wx">⛅</span>16° · partly<span class="kwh">14.2 kWh</span></div>
+      <div class="cell"><span class="dayname">Wed</span><span class="wx">☁️</span>13° · cloudy<span class="kwh">13.5 kWh</span></div>
+      <div class="cell today"><span class="dayname">Thu · today</span><span class="wx">☀️</span>18° · clear<span class="kwh">18.8 kWh</span></div>
+      <div class="cell"><span class="dayname">Fri</span><span class="wx">☀️</span>19° · clear<span class="kwh">19.6 kWh</span></div>
+      <div class="cell"><span class="dayname">Sat</span><span class="wx">🌧️</span>11° · rain<span class="kwh">11.5 kWh</span></div>
+      <div class="cell"><span class="dayname">Sun</span><span class="wx">⛅</span>15° · partly<span class="kwh">15.0 kWh</span></div>
+    </div>
+  </section>
+
+  <section class="cards">
+    <div class="card">
+      <div class="label">Battery backup</div>
+      <div class="value">~4.2 <span class="unit">hours</span></div>
+      <div class="note">4 kWh usable at your typical evening load (0.95 kW). Enough to ride out most unplanned outages.</div>
+    </div>
+    <div class="card">
+      <div class="label">Best hours for heavy loads</div>
+      <div class="value">11:00–14:30</div>
+      <div class="note">Peak generation window today — run the geyser or pool pump then to use free sun instead of the grid.</div>
+      <a class="pill" href="#">See today's curve</a>
+    </div>
+    <div class="card">
+      <div class="label">Forecast accuracy · 14 days</div>
+      <div class="value">±6<span class="unit">%</span></div>
+      <div class="note">Yesterday came in <span class="neg">R12 under</span> forecast — cloud cover arrived earlier than predicted.</div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
