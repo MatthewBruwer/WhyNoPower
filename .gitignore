@@ -1,7 +1,9 @@
 ﻿# ===== Secrets — never commit =====
 .env
 *.env.local
-appsettings.*.Local.json
+appsettings.*.json
+!appsettings.json
+!appsettings.*.example.json
 
 # ===== .NET =====
 bin/
