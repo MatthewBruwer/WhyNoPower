@@ -1,48 +1,39 @@
-﻿# ===== Secrets =====
+﻿# ===== Secrets — never commit =====
 .env
-.env.local
-*.env
-!.env.example
+*.env.local
+appsettings.*.Local.json
 
 # ===== .NET =====
 bin/
 obj/
 *.user
-*.suo
 .vs/
-[Dd]ebug/
-[Rr]elease/
-*.dll
-*.pdb
+*.suo
+TestResults/
+artifacts/
 
 # ===== Node / React =====
 node_modules/
 dist/
-build/
 .vite/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+*.tsbuildinfo
 
 # ===== Python =====
 __pycache__/
 *.py[cod]
-*.egg-info/
 .venv/
 venv/
 .ipynb_checkpoints/
-*.sqlite3
+*.egg-info/
+.pytest_cache/
 
-# ===== IDE / OS =====
+# ===== IDE =====
 .idea/
 *.swp
 .DS_Store
-Thumbs.db
 
-# ===== Azure / deployment =====
-*.PublishSettings
-local.settings.json
-
-# ===== Logs =====
-*.log
+# ===== Local databases / logs =====
+*.mdf
+*.ldf
 logs/
+*.log
